@@ -16,12 +16,12 @@ Rule Alpha Data Services
 
 ## 📋 服務詳情
 
-| 服務 | 功能 | 執行頻率 | MQTT主題 |
-|------|------|----------|----------|
-| **stock-close** | 收盤價爬蟲 | 工作日 15:00 | `RuleAlpha/stock/{id}/close` |
-| **stock-realtime** | 即時數據 | 盤中每5分鐘 | `RuleAlpha/stock/{id}/realtime` |
-| **stock-volume** | 成交量分析 | 盤中每10分鐘 | `RuleAlpha/stock/{id}/volume` |
-| **stock-technical** | 技術指標 | 工作日 16:00 | `RuleAlpha/stock/{id}/technical` |
+| 服務 | 功能 | 執行頻率 | MQTT主題 | 狀態 |
+|------|------|----------|----------|------|
+| **stock-close** | 收盤價爬蟲 | 工作日 15:00 | `RuleAlpha/stock/{id}/close` | ✅ 運行中 |
+| **stock-realtime** | 即時數據 | 盤中每5分鐘 | `RuleAlpha/stock/{id}/realtime` | ✅ 運行中 |
+| **stock-volume** | 成交量分析 | 盤中每10分鐘 | `RuleAlpha/stock/{id}/volume` | ✅ 運行中 |
+| **stock-technical** | 技術指標 | 工作日 16:00 | `RuleAlpha/stock/{id}/technical` | ✅ 運行中 |
 
 ## 🚀 快速部署
 
@@ -97,14 +97,17 @@ docker-compose --profile development up -d
 #### 數據庫配置
 ```bash
 RULE_ALPHA_DB_NAME=rule_alpha          # 數據庫名稱
-RULE_ALPHA_DB_USER=rule_alpha_user     # 數據庫用戶
-RULE_ALPHA_DB_PASSWORD=your_password   # 數據庫密碼
+RULE_ALPHA_DB_USER=pma                 # 數據庫用戶
+RULE_ALPHA_DB_PASSWORD=****            # 數據庫密碼
 ```
 
 #### MQTT配置
 ```bash
 MQTT_USERNAME=cocaen                   # MQTT用戶名
-MQTT_PASSWORD=your_mqtt_password       # MQTT密碼
+MQTT_PASSWORD=****                     # MQTT密碼
+MQTT_HOST=mosquitto                    # MQTT主機
+MQTT_PORT=1883                         # MQTT端口
+MQTT_USE_SSL=false                     # 關閉SSL（使用內網通信）
 ```
 
 #### 執行時間配置
@@ -246,35 +249,50 @@ docker-compose logs rule_alpha_stock_volume | grep "VOLUME_SPIKE"
 - 防火牆配置
 - 存取日誌記錄
 
+## 🔄 部署狀態
+
+### 當前版本：v1.0.0 (2025-07-14)
+- ✅ rule_alpha_stock_close: 運行中，已修復MQTT連接
+- ✅ rule_alpha_stock_realtime: 運行中，非交易時間待機
+- ✅ rule_alpha_stock_volume: 運行中，已修復MQTT連接
+- ✅ rule_alpha_stock_technical: 運行中，定時執行中
+- ✅ 數據庫集成: 正常
+- ✅ MQTT通信: 正常（已切換至非SSL模式）
+
+### 最近更新
+- 2025-07-14: 修復MQTT連接問題，更新環境變數配置
+- 2025-07-14: 統一MQTT配置，添加SSL開關
+- 2025-07-14: 更新資料庫用戶配置
+
 ## 🐛 故障排除
 
 ### 常見問題
 
-1. **數據收集失敗**
+1. **MQTT連接問題** ✅ 已修復
    ```bash
-   # 檢查API連接
-   docker-compose run --rm rule_alpha_stock_close python main.py --test-api
+   # 檢查MQTT連接狀態
+   docker-compose logs rule_alpha_stock_close | grep MQTT
    
-   # 檢查網路連接
-   docker-compose run --rm rule_alpha_stock_close ping tw.stock.yahoo.com
+   # 查看MQTT broker日誌
+   docker logs mosquitto
    ```
 
-2. **MQTT連接問題**
-   ```bash
-   # 檢查MQTT連接
-   docker-compose run --rm rule_alpha_stock_close python main.py --test-mqtt
-   
-   # 查看MQTT日誌
-   docker-compose logs mosquitto
-   ```
-
-3. **數據庫連接失敗**
+2. **數據庫連接失敗**
    ```bash
    # 檢查數據庫連接
-   docker-compose run --rm rule_alpha_stock_close python main.py --test-db
+   docker-compose logs rule_alpha_stock_close | grep database
    
    # 查看數據庫日誌
-   docker-compose logs mariadb
+   docker logs mariadb
+   ```
+
+3. **數據收集失敗**
+   ```bash
+   # 檢查網路連接
+   docker-compose exec rule_alpha_stock_close ping tw.stock.yahoo.com
+   
+   # 查看收集日誌
+   docker-compose logs rule_alpha_stock_close --tail 50
    ```
 
 ### 調試模式

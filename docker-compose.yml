@@ -1,8 +1,7 @@
-version: '3.8'
-
 networks:
   cocaen-net:
     external: true
+    name: cocaen-docker_cocaen-net
 
 services:
   # 股票收盤價服務
@@ -17,8 +16,9 @@ services:
       - DB_NAME=${RULE_ALPHA_DB_NAME:-rule_alpha}
       - DB_USER=${RULE_ALPHA_DB_USER:-rule_alpha_user}
       - DB_PASSWORD=${RULE_ALPHA_DB_PASSWORD}
-      - MQTT_BROKER=mosquitto
+      - MQTT_HOST=mosquitto
       - MQTT_PORT=1883
+      - MQTT_USE_SSL=false
       - MQTT_USERNAME=${MQTT_USERNAME}
       - MQTT_PASSWORD=${MQTT_PASSWORD}
       - CLOSE_SCHEDULE_TIME=${CLOSE_SCHEDULE_TIME:-15:00}
@@ -42,8 +42,9 @@ services:
       - DB_NAME=${RULE_ALPHA_DB_NAME:-rule_alpha}
       - DB_USER=${RULE_ALPHA_DB_USER:-rule_alpha_user}
       - DB_PASSWORD=${RULE_ALPHA_DB_PASSWORD}
-      - MQTT_BROKER=mosquitto
+      - MQTT_HOST=mosquitto
       - MQTT_PORT=1883
+      - MQTT_USE_SSL=false
       - MQTT_USERNAME=${MQTT_USERNAME}
       - MQTT_PASSWORD=${MQTT_PASSWORD}
       - REALTIME_INTERVAL=${REALTIME_INTERVAL:-5}
@@ -67,8 +68,9 @@ services:
       - DB_NAME=${RULE_ALPHA_DB_NAME:-rule_alpha}
       - DB_USER=${RULE_ALPHA_DB_USER:-rule_alpha_user}
       - DB_PASSWORD=${RULE_ALPHA_DB_PASSWORD}
-      - MQTT_BROKER=mosquitto
+      - MQTT_HOST=mosquitto
       - MQTT_PORT=1883
+      - MQTT_USE_SSL=false
       - MQTT_USERNAME=${MQTT_USERNAME}
       - MQTT_PASSWORD=${MQTT_PASSWORD}
       - VOLUME_ANALYSIS_INTERVAL=${VOLUME_ANALYSIS_INTERVAL:-10}
@@ -92,8 +94,9 @@ services:
       - DB_NAME=${RULE_ALPHA_DB_NAME:-rule_alpha}
       - DB_USER=${RULE_ALPHA_DB_USER:-rule_alpha_user}
       - DB_PASSWORD=${RULE_ALPHA_DB_PASSWORD}
-      - MQTT_BROKER=mosquitto
+      - MQTT_HOST=mosquitto
       - MQTT_PORT=1883
+      - MQTT_USE_SSL=false
       - MQTT_USERNAME=${MQTT_USERNAME}
       - MQTT_PASSWORD=${MQTT_PASSWORD}
       - TECHNICAL_SCHEDULE_TIME=${TECHNICAL_SCHEDULE_TIME:-16:00}
