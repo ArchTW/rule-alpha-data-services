@@ -1,0 +1,12 @@
+[submodule "rule_alpha_stock_close"]
+	path = rule_alpha_stock_close
+	url = https://github.com/ArchTW/rule_alpha_stock_close.git
+[submodule "rule_alpha_stock_realtime"]
+	path = rule_alpha_stock_realtime
+	url = https://github.com/ArchTW/rule_alpha_stock_realtime.git
+[submodule "rule_alpha_stock_technical"]
+	path = rule_alpha_stock_technical
+	url = https://github.com/ArchTW/rule_alpha_stock_technical.git
+[submodule "rule_alpha_stock_volume"]
+	path = rule_alpha_stock_volume
+	url = https://github.com/ArchTW/rule_alpha_stock_volume.git

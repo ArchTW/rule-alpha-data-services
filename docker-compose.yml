@@ -1,7 +1,7 @@
 version: '3.8'
 
 networks:
-  rule-alpha-net:
+  cocaen-net:
     external: true
 
 services:
@@ -25,7 +25,7 @@ services:
       - MARKET_START=${MARKET_START:-09:00}
       - MARKET_END=${MARKET_END:-13:30}
     networks:
-      - rule-alpha-net
+      - cocaen-net
     volumes:
       - ./rule_alpha_stock_close/logs:/app/logs
     profiles: ["production", "data-services"]
@@ -50,7 +50,7 @@ services:
       - MARKET_START=${MARKET_START:-09:00}
       - MARKET_END=${MARKET_END:-13:30}
     networks:
-      - rule-alpha-net
+      - cocaen-net
     volumes:
       - ./rule_alpha_stock_realtime/logs:/app/logs
     profiles: ["production", "data-services"]
@@ -75,7 +75,7 @@ services:
       - BIG_TRADE_THRESHOLD=${BIG_TRADE_THRESHOLD:-1000}
       - VOLUME_SPIKE_THRESHOLD=${VOLUME_SPIKE_THRESHOLD:-3.0}
     networks:
-      - rule-alpha-net
+      - cocaen-net
     volumes:
       - ./rule_alpha_stock_volume/logs:/app/logs
     profiles: ["production", "data-services"]
@@ -99,7 +99,7 @@ services:
       - TECHNICAL_SCHEDULE_TIME=${TECHNICAL_SCHEDULE_TIME:-16:00}
       - STRONG_SIGNAL_THRESHOLD=${STRONG_SIGNAL_THRESHOLD:-80.0}
     networks:
-      - rule-alpha-net
+      - cocaen-net
     volumes:
       - ./rule_alpha_stock_technical/logs:/app/logs
     profiles: ["production", "data-services"]
