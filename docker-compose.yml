@@ -1,0 +1,170 @@
+version: '3.8'
+
+networks:
+  cocaen-net:
+    external: true
+
+services:
+  # 股票收盤價服務
+  rule_alpha_stock_close:
+    build:
+      context: ./rule_alpha_stock_close
+      dockerfile: Dockerfile
+    container_name: rule-alpha-stock-close
+    restart: always
+    environment:
+      - DB_HOST=mariadb
+      - DB_NAME=${RULE_ALPHA_DB_NAME:-rule_alpha}
+      - DB_USER=${RULE_ALPHA_DB_USER:-rule_alpha_user}
+      - DB_PASSWORD=${RULE_ALPHA_DB_PASSWORD}
+      - MQTT_BROKER=mosquitto
+      - MQTT_PORT=1883
+      - MQTT_USERNAME=${MQTT_USERNAME}
+      - MQTT_PASSWORD=${MQTT_PASSWORD}
+      - CLOSE_SCHEDULE_TIME=${CLOSE_SCHEDULE_TIME:-15:00}
+      - MARKET_START=${MARKET_START:-09:00}
+      - MARKET_END=${MARKET_END:-13:30}
+    networks:
+      - cocaen-net
+    volumes:
+      - ./rule_alpha_stock_close/logs:/app/logs
+    profiles: ["production", "data-services"]
+
+  # 股票即時數據服務
+  rule_alpha_stock_realtime:
+    build:
+      context: ./rule_alpha_stock_realtime
+      dockerfile: Dockerfile
+    container_name: rule-alpha-stock-realtime
+    restart: always
+    environment:
+      - DB_HOST=mariadb
+      - DB_NAME=${RULE_ALPHA_DB_NAME:-rule_alpha}
+      - DB_USER=${RULE_ALPHA_DB_USER:-rule_alpha_user}
+      - DB_PASSWORD=${RULE_ALPHA_DB_PASSWORD}
+      - MQTT_BROKER=mosquitto
+      - MQTT_PORT=1883
+      - MQTT_USERNAME=${MQTT_USERNAME}
+      - MQTT_PASSWORD=${MQTT_PASSWORD}
+      - REALTIME_INTERVAL=${REALTIME_INTERVAL:-5}
+      - MARKET_START=${MARKET_START:-09:00}
+      - MARKET_END=${MARKET_END:-13:30}
+    networks:
+      - cocaen-net
+    volumes:
+      - ./rule_alpha_stock_realtime/logs:/app/logs
+    profiles: ["production", "data-services"]
+
+  # 股票成交量分析服務
+  rule_alpha_stock_volume:
+    build:
+      context: ./rule_alpha_stock_volume
+      dockerfile: Dockerfile
+    container_name: rule-alpha-stock-volume
+    restart: always
+    environment:
+      - DB_HOST=mariadb
+      - DB_NAME=${RULE_ALPHA_DB_NAME:-rule_alpha}
+      - DB_USER=${RULE_ALPHA_DB_USER:-rule_alpha_user}
+      - DB_PASSWORD=${RULE_ALPHA_DB_PASSWORD}
+      - MQTT_BROKER=mosquitto
+      - MQTT_PORT=1883
+      - MQTT_USERNAME=${MQTT_USERNAME}
+      - MQTT_PASSWORD=${MQTT_PASSWORD}
+      - VOLUME_ANALYSIS_INTERVAL=${VOLUME_ANALYSIS_INTERVAL:-10}
+      - BIG_TRADE_THRESHOLD=${BIG_TRADE_THRESHOLD:-1000}
+      - VOLUME_SPIKE_THRESHOLD=${VOLUME_SPIKE_THRESHOLD:-3.0}
+    networks:
+      - cocaen-net
+    volumes:
+      - ./rule_alpha_stock_volume/logs:/app/logs
+    profiles: ["production", "data-services"]
+
+  # 股票技術分析服務
+  rule_alpha_stock_technical:
+    build:
+      context: ./rule_alpha_stock_technical
+      dockerfile: Dockerfile
+    container_name: rule-alpha-stock-technical
+    restart: always
+    environment:
+      - DB_HOST=mariadb
+      - DB_NAME=${RULE_ALPHA_DB_NAME:-rule_alpha}
+      - DB_USER=${RULE_ALPHA_DB_USER:-rule_alpha_user}
+      - DB_PASSWORD=${RULE_ALPHA_DB_PASSWORD}
+      - MQTT_BROKER=mosquitto
+      - MQTT_PORT=1883
+      - MQTT_USERNAME=${MQTT_USERNAME}
+      - MQTT_PASSWORD=${MQTT_PASSWORD}
+      - TECHNICAL_SCHEDULE_TIME=${TECHNICAL_SCHEDULE_TIME:-16:00}
+      - STRONG_SIGNAL_THRESHOLD=${STRONG_SIGNAL_THRESHOLD:-80.0}
+    networks:
+      - cocaen-net
+    volumes:
+      - ./rule_alpha_stock_technical/logs:/app/logs
+    profiles: ["production", "data-services"]
+
+  # 開發環境服務
+  rule_alpha_stock_close_dev:
+    build:
+      context: ./rule_alpha_stock_close
+      dockerfile: Dockerfile
+    container_name: rule-alpha-stock-close-dev
+    restart: unless-stopped
+    environment:
+      - DB_HOST=localhost
+      - DB_NAME=rule_alpha_dev
+      - DB_USER=root
+      - DB_PASSWORD=
+      - MQTT_BROKER=localhost
+      - MQTT_PORT=1883
+      - CLOSE_SCHEDULE_TIME=15:00
+    profiles: ["development"]
+
+  rule_alpha_stock_realtime_dev:
+    build:
+      context: ./rule_alpha_stock_realtime
+      dockerfile: Dockerfile
+    container_name: rule-alpha-stock-realtime-dev
+    restart: unless-stopped
+    environment:
+      - DB_HOST=localhost
+      - DB_NAME=rule_alpha_dev
+      - DB_USER=root
+      - DB_PASSWORD=
+      - MQTT_BROKER=localhost
+      - MQTT_PORT=1883
+      - REALTIME_INTERVAL=5
+    profiles: ["development"]
+
+  rule_alpha_stock_volume_dev:
+    build:
+      context: ./rule_alpha_stock_volume
+      dockerfile: Dockerfile
+    container_name: rule-alpha-stock-volume-dev
+    restart: unless-stopped
+    environment:
+      - DB_HOST=localhost
+      - DB_NAME=rule_alpha_dev
+      - DB_USER=root
+      - DB_PASSWORD=
+      - MQTT_BROKER=localhost
+      - MQTT_PORT=1883
+      - VOLUME_ANALYSIS_INTERVAL=10
+    profiles: ["development"]
+
+  rule_alpha_stock_technical_dev:
+    build:
+      context: ./rule_alpha_stock_technical
+      dockerfile: Dockerfile
+    container_name: rule-alpha-stock-technical-dev
+    restart: unless-stopped
+    environment:
+      - DB_HOST=localhost
+      - DB_NAME=rule_alpha_dev
+      - DB_USER=root
+      - DB_PASSWORD=
+      - MQTT_BROKER=localhost
+      - MQTT_PORT=1883
+      - TECHNICAL_SCHEDULE_TIME=16:00
+    profiles: ["development"]
